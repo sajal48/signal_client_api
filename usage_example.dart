@@ -85,19 +85,17 @@ Future<void> twoUserMessagingExample() async {
     );
     print('👨 Bob initialized');
     
-    // Alice uploads her keys to Firebase
+    // 🔧 CURRENT: Manual key upload (but should be automatic)
     await aliceApi.uploadKeysToFirebase();
     print('🔑 Alice uploaded keys to Firebase');
     
-    // Bob uploads his keys to Firebase
     await bobApi.uploadKeysToFirebase();
     print('🔑 Bob uploaded keys to Firebase');
     
-    // Bob checks if Alice has keys available
+    // 🔧 CURRENT: Manual key checking (but should auto-fetch if not found)
     final aliceHasKeys = await bobApi.hasKeysForUser('alice@example.com');
     print('🔍 Alice has keys available: $aliceHasKeys');
     
-    // Alice checks if Bob has keys available
     final bobHasKeys = await aliceApi.hasKeysForUser('bob@example.com');
     print('🔍 Bob has keys available: $bobHasKeys');
     
@@ -105,15 +103,22 @@ Future<void> twoUserMessagingExample() async {
       print('✅ Both users have keys - messaging is possible!');
       
       // In a real app, you would now:
-      // 1. Fetch recipient's keys from Firebase
+      // 1. Fetch recipient's keys from Firebase (if not cached)
       // 2. Establish sessions using the core crypto API
       // 3. Encrypt/decrypt messages
       
       print('📝 Next steps:');
-      print('   - Fetch keys using refreshUserKeys()');
+      print('   - Keys should be fetched automatically when needed');
       print('   - Use core crypto API for encryption/decryption');
       print('   - See real_signal_encryption_test.dart for crypto examples');
+      print('   - See auto_sync_example.dart for automatic key management');
     }
+    
+    // 🚀 BETTER APPROACH: Use the AutoSignalService from auto_sync_example.dart
+    print('\n💡 TIP: For automatic key sync, use AutoSignalService:');
+    print('   await service.canMessageUser("recipient") // auto-fetches keys');
+    print('   Keys uploaded automatically on initialization');
+    print('   Background sync every few minutes');
     
     // Clean up
     await aliceApi.dispose();

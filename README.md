@@ -85,6 +85,16 @@ dart run quick_start.dart
 dart run usage_example.dart
 ```
 
+#### Automatic Key Sync
+```bash
+dart run auto_sync_example.dart
+```
+
+#### Complete End-to-End Example
+```bash
+dart run complete_example.dart
+```
+
 #### Flutter Example App
 ```bash
 cd example && flutter run
@@ -93,9 +103,10 @@ cd example && flutter run
 The examples demonstrate:
 - Two-user messaging setup
 - Key management and Firebase integration  
-- Error handling patterns
-- Real encryption/decryption (see tests)
+- Automatic vs manual key sync patterns
+- Real encryption/decryption with Signal Protocol
 - Production-ready service patterns
+- Error handling and offline support
 
 ## Core Components
 
