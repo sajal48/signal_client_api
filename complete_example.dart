@@ -249,6 +249,8 @@ Future<void> demonstrateRealEncryption() async {
         encryptedData,
       );
       
+      print('   🔓 Bob successfully received: "$decryptedMessage"');
+      
       // Bob replies with REAL encryption
       print('\n7️⃣ Bob sends REALLY encrypted reply...');
       final replyData = await bobService.sendMessage(
@@ -262,6 +264,8 @@ Future<void> demonstrateRealEncryption() async {
         'bob@example.com',
         replyData,
       );
+      
+      print('   🔓 Alice successfully received: "$replyDecrypted"');
       
       print('\n🎉 REAL Signal Protocol encryption/decryption SUCCESSFUL!');
       
@@ -279,59 +283,19 @@ Future<void> demonstrateRealEncryption() async {
       print('💡 In production: Ensure both users have uploaded their keys to the server');
     }
     
+    // Clean up
+    await aliceService.dispose();
+    await bobService.dispose();
+    
   } catch (e) {
     print('❌ REAL encryption demo failed: $e');
     print('🔍 This demonstrates real error handling in production encryption');
   }
 }
-      final encrypted2 = await bobService.sendMessage('alice@example.com', message2);
-      
-      // Alice receives and decrypts Bob's reply
-      final decrypted2 = await aliceService.receiveMessage('bob@example.com', encrypted2);
-      
-      print('\n✅ Complete conversation:');
-      print('Alice → Bob: "$decrypted1"');
-      print('Bob → Alice: "$decrypted2"');
-      
-      // Test multiple messages in same session
-      print('\n🔄 Testing session persistence...');
-      
-      final messages = [
-        "This is message 2",
-        "This is message 3", 
-        "Session should persist!"
-      ];
-      
-      for (int i = 0; i < messages.length; i++) {
-        final encrypted = await aliceService.sendMessage('bob@example.com', messages[i]);
-        final decrypted = await bobService.receiveMessage('alice@example.com', encrypted);
-        print('Message ${i + 2}: "$decrypted" ✅');
-      }
-      
-      print('\n🎉 All messages encrypted and decrypted successfully!');
-      print('📊 Session management working correctly');
-      
-    } else {
-      print('❌ Messaging not possible - key exchange failed');
-    }
-    
-    // Clean up
-    print('\n🧹 Cleaning up...');
-    await aliceService.dispose();
-    await bobService.dispose();
-    
-    print('✅ Complete example finished successfully!');
-    
-  } catch (e, stackTrace) {
-    print('❌ Error in complete example: $e');
-    print('Stack trace: $stackTrace');
-  }
-}
 
-/// Real encryption example using libsignal directly
+/// Low-level Signal Protocol encryption/decryption example using libsignal directly
 Future<void> realCryptoExample() async {
-  print('\n🔐 Real Crypto Example (using libsignal directly)');
-  print('=' * 60);
+  print('\n� === Low-Level Real Crypto Example ===\n');
   
   try {
     // Create protocol addresses
