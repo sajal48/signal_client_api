@@ -1,0 +1,25 @@
+name: signal_protocol_example
+description: Example app demonstrating Signal Protocol Flutter package usage
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  signal_protocol_flutter:
+    path: ../
+  firebase_core: ^2.24.0
+  firebase_database: ^10.4.0
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
