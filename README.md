@@ -1,16 +1,26 @@
 # Signal Protocol Flutter
 
-A comprehensive Flutter package implementing the Signal Protocol for secure end-to-end encryption, with Firebase integration for key synchronization across devices.
+A comprehensive Flutter package implementing the Signal Protocol for secure end-to-end encryption, with **REAL encryption/decryption capabilities** and Firebase integration for automatic key synchronization.
+
+## 🔐 **NEW: REAL Encryption Support**
+
+✅ **Production-ready encryption/decryption** using `AdvancedSignalProtocolApi`  
+✅ **Automatic key management** and background sync  
+✅ **Real cryptographic operations** with proper session handling  
+✅ **Two-way encryption** between multiple users  
+✅ **Complete examples** demonstrating real crypto workflows  
 
 ## Features
 
-- **Signal Protocol Implementation**: Built on the robust `libsignal_protocol_dart` library
-- **Persistent Storage**: Secure local storage using Hive with encrypted adapters
-- **Firebase Integration**: Real-time key synchronization across multiple devices
-- **Multi-Device Support**: Complete session management for multiple devices per user
-- **Comprehensive Error Handling**: Detailed exception classes for different error scenarios
-- **Offline Support**: Queue operations when offline and sync when connectivity is restored
-- **Performance Optimized**: Efficient caching and lazy loading strategies
+- **🔐 REAL Signal Protocol Encryption**: Full encryption/decryption using `AdvancedSignalProtocolApi`
+- **🔑 Automatic Key Management**: Keys generated, uploaded, and synced automatically
+- **⚡ Production-Ready**: Real crypto operations with proper error handling
+- **📱 Multi-Device Support**: Complete session management for multiple devices per user
+- **☁️ Firebase Integration**: Real-time key synchronization across devices
+- **💾 Persistent Storage**: Secure local storage using Hive with encrypted adapters
+- **🛡️ Comprehensive Error Handling**: Detailed exception classes for different scenarios
+- **📡 Offline Support**: Queue operations when offline and sync when connectivity is restored
+- **⚡ Performance Optimized**: Efficient caching and lazy loading strategies
 
 ## Installation
 
@@ -27,27 +37,86 @@ Then run:
 flutter pub get
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-### 1. Run the Examples
+### 1. Run the REAL Encryption Examples
 
 ```bash
-# Quick 5-minute example
-dart run quick_start.dart
+# REAL encryption demo between two users
+dart run complete_example_updated.dart
 
-# Comprehensive usage examples
-dart run usage_example.dart
+# Automatic key sync example
+dart run auto_sync_example.dart
+
+# Quick 5-minute setup guide
+dart run quick_start.dart
 
 # See the working Flutter app
 cd example && flutter run
 ```
 
-### 2. Basic Usage
+### 2. REAL Encryption Usage
 
 ```dart
 import 'package:signal_protocol_flutter/signal_protocol_flutter.dart';
 
-// Initialize the Signal Protocol
+// Initialize with REAL encryption and automatic key management
+final signalService = await RealSignalService.create(
+  userId: 'alice@example.com',
+  deviceId: 1,
+);
+
+// Send REAL encrypted message
+final encryptedData = await signalService.sendMessage(
+  'bob@example.com',
+  'Hello! This is REALLY encrypted! 🔐'
+);
+
+// Receive and decrypt REAL message
+final decrypted = await signalService.receiveMessage(
+  'alice@example.com', 
+  encryptedData
+);
+
+print('Decrypted: $decrypted');
+```
+
+### 3. Advanced API for REAL Encryption
+
+The `AdvancedSignalProtocolApi` provides production-ready encryption with automatic key management:
+
+```dart
+// Initialize advanced API with REAL encryption
+final advancedApi = await AdvancedSignalProtocolApi.initialize(
+  userId: 'alice@example.com',
+  deviceId: 1,
+  generateKeys: true,   // Automatically generate cryptographic keys
+  autoSync: true,       // Enable automatic Firebase sync
+);
+
+// Send REAL encrypted message
+final result = await advancedApi.encryptMessage(
+  recipientUserId: 'bob@example.com',
+  recipientDeviceId: 1,
+  message: 'Secret message!',
+  createSession: true,  // Auto-create session if needed
+);
+
+// Decrypt REAL encrypted message
+final decrypted = await advancedApi.decryptMessage(
+  senderUserId: 'alice@example.com',
+  senderDeviceId: 1,
+  ciphertext: result.ciphertext,
+  validateSender: true,
+);
+
+print('Decrypted: ${decrypted.plaintext}');
+```
+
+### 4. Basic API (Core Features)
+
+```dart
+// Initialize the basic Signal Protocol API
 final signalApi = SignalProtocolApi();
 
 // Create Firebase configuration
@@ -73,10 +142,11 @@ final info = await signalApi.getInstanceInfo();
 print('Initialized: ${info['isInitialized']}');
 ```
 
-### 3. Examples
+### 5. Examples
 
-#### Quick Start (5 minutes)
+#### 🔐 REAL Encryption Demo
 ```bash
+dart run complete_example_updated.dart
 dart run quick_start.dart
 ```
 

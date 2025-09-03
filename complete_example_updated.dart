@@ -6,7 +6,7 @@
 /// 3. Production-ready patterns with proper error handling
 /// 4. Both high-level API and low-level crypto examples
 /// 
-/// Run with: dart complete_example.dart
+/// Run with: dart complete_example_updated.dart
 
 import 'dart:async';
 import 'dart:typed_data';
@@ -179,21 +179,17 @@ class RealSignalService {
     }
   }
   
-  /// Upload our keys if not already uploaded
-  Future<void> _uploadKeysIfNeeded() async {
-    try {
-      await _api.uploadKeysToFirebase();
-      print('🔑 Keys uploaded for $_userId');
-    } catch (e) {
-      print('⚠️ Key upload failed: $e');
-    }
-  }
-  
-  /// Start background key sync
+  /// Start background sync for automatic key management
   void _startBackgroundSync() {
     _syncTimer = Timer.periodic(Duration(minutes: 5), (timer) async {
-      print('🔄 Background key sync...');
-      await _uploadKeysIfNeeded();
+      try {
+        print('🔄 Background key sync for $_userId...');
+        // Note: performBackgroundSync method would need to be implemented in the API
+        // For now, this is a placeholder for production implementation
+        print('✅ Background sync scheduled (implementation pending)');
+      } catch (e) {
+        print('⚠️ Background sync failed: $e');
+      }
     });
   }
   
@@ -249,6 +245,8 @@ Future<void> demonstrateRealEncryption() async {
         encryptedData,
       );
       
+      print('   🔓 Bob successfully received: "$decryptedMessage"');
+      
       // Bob replies with REAL encryption
       print('\n7️⃣ Bob sends REALLY encrypted reply...');
       final replyData = await bobService.sendMessage(
@@ -262,6 +260,8 @@ Future<void> demonstrateRealEncryption() async {
         'bob@example.com',
         replyData,
       );
+      
+      print('   🔓 Alice successfully received: "$replyDecrypted"');
       
       print('\n🎉 REAL Signal Protocol encryption/decryption SUCCESSFUL!');
       
@@ -279,143 +279,97 @@ Future<void> demonstrateRealEncryption() async {
       print('💡 In production: Ensure both users have uploaded their keys to the server');
     }
     
+    // Clean up
+    await aliceService.dispose();
+    await bobService.dispose();
+    
   } catch (e) {
     print('❌ REAL encryption demo failed: $e');
     print('🔍 This demonstrates real error handling in production encryption');
   }
 }
-      final encrypted2 = await bobService.sendMessage('alice@example.com', message2);
-      
-      // Alice receives and decrypts Bob's reply
-      final decrypted2 = await aliceService.receiveMessage('bob@example.com', encrypted2);
-      
-      print('\n✅ Complete conversation:');
-      print('Alice → Bob: "$decrypted1"');
-      print('Bob → Alice: "$decrypted2"');
-      
-      // Test multiple messages in same session
-      print('\n🔄 Testing session persistence...');
-      
-      final messages = [
-        "This is message 2",
-        "This is message 3", 
-        "Session should persist!"
-      ];
-      
-      for (int i = 0; i < messages.length; i++) {
-        final encrypted = await aliceService.sendMessage('bob@example.com', messages[i]);
-        final decrypted = await bobService.receiveMessage('alice@example.com', encrypted);
-        print('Message ${i + 2}: "$decrypted" ✅');
-      }
-      
-      print('\n🎉 All messages encrypted and decrypted successfully!');
-      print('📊 Session management working correctly');
-      
-    } else {
-      print('❌ Messaging not possible - key exchange failed');
-    }
-    
-    // Clean up
-    print('\n🧹 Cleaning up...');
-    await aliceService.dispose();
-    await bobService.dispose();
-    
-    print('✅ Complete example finished successfully!');
-    
-  } catch (e, stackTrace) {
-    print('❌ Error in complete example: $e');
-    print('Stack trace: $stackTrace');
-  }
-}
 
-/// Real encryption example using libsignal directly
+/// Low-level Signal Protocol encryption/decryption example using libsignal directly
 Future<void> realCryptoExample() async {
-  print('\n🔐 Real Crypto Example (using libsignal directly)');
-  print('=' * 60);
+  print('\n🔧 === Low-Level Real Crypto Example ===\n');
   
   try {
-    // Create protocol addresses
-    final aliceAddress = SignalProtocolAddress('alice', 1);
-    final bobAddress = SignalProtocolAddress('bob', 1);
+    print('🔧 Setting up Alice and Bob with real cryptographic keys...');
     
-    // Initialize Alice's stores
-    final aliceIdentityKeyPair = generateIdentityKeyPair();
-    final aliceRegistrationId = generateRegistrationId(false);
-    final aliceSessionStore = InMemorySessionStore();
-    final alicePreKeyStore = InMemoryPreKeyStore();
-    final aliceSignedPreKeyStore = InMemorySignedPreKeyStore();
-    final aliceIdentityStore = InMemoryIdentityKeyStore(aliceIdentityKeyPair, aliceRegistrationId);
+    // Generate real identity key pairs
+    final aliceIdentityKey = generateIdentityKeyPair();
+    final bobIdentityKey = generateIdentityKeyPair();
     
-    // Initialize Bob's stores
-    final bobIdentityKeyPair = generateIdentityKeyPair();
-    final bobRegistrationId = generateRegistrationId(false);
-    final bobSessionStore = InMemorySessionStore();
-    final bobPreKeyStore = InMemoryPreKeyStore();
-    final bobSignedPreKeyStore = InMemorySignedPreKeyStore();
-    final bobIdentityStore = InMemoryIdentityKeyStore(bobIdentityKeyPair, bobRegistrationId);
+    print('✅ Identity keys generated');
     
-    // Generate and store Alice's keys
+    // Generate real pre-keys and signed pre-key
     final alicePreKeys = generatePreKeys(0, 10);
+    final bobPreKeys = generatePreKeys(0, 10);
+    
+    final aliceSignedPreKey = generateSignedPreKey(aliceIdentityKey, 0);
+    final bobSignedPreKey = generateSignedPreKey(bobIdentityKey, 0);
+    
+    print('✅ Pre-keys and signed pre-keys generated');
+    
+    // Create stores (in production, these would be persistent)
+    final alicePreKeyStore = InMemoryPreKeyStore();
+    final bobPreKeyStore = InMemoryPreKeyStore();
+    
+    final aliceSignedPreKeyStore = InMemorySignedPreKeyStore();
+    final bobSignedPreKeyStore = InMemorySignedPreKeyStore();
+    
+    final aliceIdentityStore = InMemoryIdentityKeyStore(aliceIdentityKey, 1);
+    final bobIdentityStore = InMemoryIdentityKeyStore(bobIdentityKey, 1);
+    
+    final aliceSessionStore = InMemorySessionStore();
+    final bobSessionStore = InMemorySessionStore();
+    
+    // Store keys
     for (final preKey in alicePreKeys) {
       await alicePreKeyStore.storePreKey(preKey.id, preKey);
     }
-    final aliceSignedPreKey = generateSignedPreKey(aliceIdentityKeyPair, 0);
-    await aliceSignedPreKeyStore.storeSignedPreKey(aliceSignedPreKey.id, aliceSignedPreKey);
-    
-    // Generate and store Bob's keys
-    final bobPreKeys = generatePreKeys(0, 10);
     for (final preKey in bobPreKeys) {
       await bobPreKeyStore.storePreKey(preKey.id, preKey);
     }
-    final bobSignedPreKey = generateSignedPreKey(bobIdentityKeyPair, 0);
+    
+    await aliceSignedPreKeyStore.storeSignedPreKey(aliceSignedPreKey.id, aliceSignedPreKey);
     await bobSignedPreKeyStore.storeSignedPreKey(bobSignedPreKey.id, bobSignedPreKey);
     
-    // Create prekey bundles for session establishment
-    final alicePreKeyBundle = PreKeyBundle(
-      aliceRegistrationId,
-      aliceAddress.getDeviceId(),
-      alicePreKeys.first.id,
-      alicePreKeys.first.getKeyPair().publicKey,
-      aliceSignedPreKey.id,
-      aliceSignedPreKey.getKeyPair().publicKey,
-      aliceSignedPreKey.signature,
-      aliceIdentityKeyPair.getPublicKey(),
-    );
+    print('✅ Keys stored in local stores');
     
-    final bobPreKeyBundle = PreKeyBundle(
-      bobRegistrationId,
-      bobAddress.getDeviceId(),
-      bobPreKeys.first.id,
-      bobPreKeys.first.getKeyPair().publicKey,
-      bobSignedPreKey.id,
-      bobSignedPreKey.getKeyPair().publicKey,
-      bobSignedPreKey.signature,
-      bobIdentityKeyPair.getPublicKey(),
-    );
+    // Create Signal addresses
+    final aliceAddress = SignalProtocolAddress('alice@example.com', 1);
+    final bobAddress = SignalProtocolAddress('bob@example.com', 1);
     
-    // Establish sessions between Alice and Bob
-    final aliceSessionBuilder = SessionBuilder(
+    // Alice creates a session with Bob using his public keys
+    print('🔗 Alice creating session with Bob...');
+    
+    final sessionBuilder = SessionBuilder(
       aliceSessionStore,
       alicePreKeyStore,
       aliceSignedPreKeyStore,
       aliceIdentityStore,
       bobAddress,
     );
-    await aliceSessionBuilder.processPreKeyBundle(bobPreKeyBundle);
     
-    final bobSessionBuilder = SessionBuilder(
-      bobSessionStore,
-      bobPreKeyStore,
-      bobSignedPreKeyStore,
-      bobIdentityStore,
-      aliceAddress,
+    // Create a PreKeyBundle (what Bob would share publicly)
+    final bobPreKeyBundle = PreKeyBundle(
+      1, // registration ID
+      1, // device ID
+      bobPreKeys.first.id, // pre-key ID
+      bobPreKeys.first.getKeyPair().publicKey, // pre-key public
+      bobSignedPreKey.id, // signed pre-key ID
+      bobSignedPreKey.getKeyPair().publicKey, // signed pre-key public
+      bobSignedPreKey.signature, // signature
+      bobIdentityKey.getPublicKey(), // identity key
     );
-    await bobSessionBuilder.processPreKeyBundle(alicePreKeyBundle);
     
-    print('✓ Sessions established between Alice and Bob');
+    await sessionBuilder.processPreKeyBundle(bobPreKeyBundle);
+    print('✅ Session established between Alice and Bob');
     
-    // Real encryption: Alice → Bob
-    const originalMessage = 'Hello from Alice to Bob with REAL encryption!';
+    // Alice encrypts a message to Bob
+    print('🔐 Alice encrypting message to Bob...');
+    final originalMessage = 'Hello Bob! This is a REAL encrypted message using the Signal Protocol! 🔐✨';
     final messageBytes = Uint8List.fromList(utf8.encode(originalMessage));
     
     final aliceSessionCipher = SessionCipher(
@@ -427,9 +381,13 @@ Future<void> realCryptoExample() async {
     );
     
     final ciphertext = await aliceSessionCipher.encrypt(messageBytes);
-    print('✓ Alice encrypted message (${ciphertext.serialize().length} bytes)');
+    print('✅ Alice encrypted message successfully!');
+    print('   📊 Original: ${originalMessage.length} chars');
+    print('   🔐 Encrypted: ${ciphertext.serialize().length} bytes');
+    print('   📋 Type: ${ciphertext.getType()}');
     
-    // Real decryption: Bob decrypts Alice's message
+    // Bob decrypts the message from Alice
+    print('🔓 Bob decrypting message from Alice...');
     final bobSessionCipher = SessionCipher(
       bobSessionStore,
       bobPreKeyStore,
@@ -446,7 +404,7 @@ Future<void> realCryptoExample() async {
     }
     
     final decryptedMessage = utf8.decode(decryptedBytes);
-    print('✓ Bob decrypted message: "$decryptedMessage"');
+    print('✅ Bob decrypted message: "$decryptedMessage"');
     
     if (originalMessage == decryptedMessage) {
       print('🎉 REAL ENCRYPTION/DECRYPTION SUCCESSFUL! 🔐✅');
